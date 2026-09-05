@@ -1,0 +1,30 @@
+import {useEffect,useState} from 'react';
+import {ActivityIndicator,BackHandler,Modal,Pressable,Text,View} from 'react-native';
+import {SafeAreaProvider,SafeAreaView} from 'react-native-safe-area-context';
+import {StatusBar} from 'expo-status-bar';
+import {StoreProvider,useApp} from './src/state/Store';
+import {NavigationProvider,type Route} from './src/navigation';
+import {Icon,Button,type IconName} from './src/components/UI';
+import {Home} from './src/screens/Home';
+import {Learn,ConceptScreen} from './src/screens/Learn';
+import {Practice} from './src/screens/Practice';
+import {Progress} from './src/screens/Progress';
+import {Study} from './src/screens/Study';
+import {Exam} from './src/screens/Exam';
+import {Result} from './src/screens/Result';
+import {Scenes} from './src/screens/Scenes';
+import {Risk} from './src/screens/Risk';
+import {Tutor} from './src/screens/Tutor';
+import {Notes} from './src/screens/Notes';
+import {Settings} from './src/screens/Settings';
+import {colors,styles as s} from './src/theme';
+import type {Tab} from './src/types';
+const tabs:{name:Tab;icon:IconName}[]=[{name:'Hoy',icon:'home'},{name:'Aprender',icon:'book-open'},{name:'Practicar',icon:'check-square'},{name:'Mi avance',icon:'bar-chart-2'}];
+function Main(){const app=useApp();const [tab,setTab]=useState<Tab>('Hoy');const [routes,setRoutes]=useState<Route[]>([{name:'tabs'}]);const [leave,setLeave]=useState(false);const route=routes.at(-1)!;
+ const pop=()=>{setRoutes(r=>r.length>1?r.slice(0,-1):r);};const back=()=>{if(route.name==='study'||route.name==='exam')setLeave(true);else if(routes.length>1)pop();else setTab('Hoy');};
+ const nav={tab,setTab,open:(r:Route)=>setRoutes(p=>[...p,r]),back,home:()=>{setRoutes([{name:'tabs'}]);setTab('Hoy');},replace:(r:Route)=>setRoutes(p=>[...p.slice(0,-1),r])};
+ useEffect(()=>{const sub=BackHandler.addEventListener('hardwareBackPress',()=>{if(routes.length===1&&tab==='Hoy')return false;back();return true;});return()=>sub.remove();},[routes,tab]);
+ const screen=route.name==='tabs'?(tab==='Hoy'?<Home/>:tab==='Aprender'?<Learn/>:tab==='Practicar'?<Practice/>:<Progress/>):route.name==='concept'?<ConceptScreen id={route.id}/>:route.name==='study'?<Study/>:route.name==='exam'?<Exam/>:route.name==='result'?<Result result={route.result}/>:route.name==='scenes'?<Scenes/>:route.name==='risk'?<Risk/>:route.name==='tutor'?<Tutor question={route.question}/>:route.name==='notes'?<Notes/>:<Settings/>;
+ return <NavigationProvider value={nav}><SafeAreaView style={[s.screen,{width:'100%',maxWidth:600,alignSelf:'center'}]}><StatusBar style="dark"/>{app.error?<View style={{padding:12,backgroundColor:colors.orangeLight}}><Text accessibilityRole="alert" style={s.muted}>{app.error}</Text></View>:null}{app.notice?<View style={[s.between,{padding:12,backgroundColor:colors.mint}]}><Text accessibilityLiveRegion="polite" style={[s.muted,{flex:1}]}>{app.notice}</Text><Pressable accessibilityLabel="Cerrar aviso" accessibilityRole="button" onPress={()=>app.setNotice(null)} style={{padding:10}}><Icon name="x" size={18}/></Pressable></View>:null}{!app.ready?<View style={{flex:1,alignItems:'center',justifyContent:'center',gap:16}}><ActivityIndicator color={colors.green}/><Text style={s.body}>Recuperando tu progreso…</Text></View>:<View style={{flex:1}}>{screen}</View>}{route.name==='tabs'&&app.ready?<View accessibilityRole="tablist" style={{flexDirection:'row',borderTopWidth:1,borderTopColor:colors.border,backgroundColor:colors.surface,paddingVertical:7}}>{tabs.map(t=><Pressable key={t.name} accessibilityRole="tab" accessibilityLabel={t.name} accessibilityState={{selected:tab===t.name}} onPress={()=>setTab(t.name)} style={{flex:1,minHeight:55,alignItems:'center',justifyContent:'center',gap:5}}><Icon name={t.icon} color={tab===t.name?colors.green:colors.muted} size={22}/><Text style={{fontSize:12,color:tab===t.name?colors.green:colors.muted,fontWeight:tab===t.name?'700':'400'}}>{t.name}</Text></Pressable>)}</View>:null}<Modal visible={leave} transparent animationType="fade" onRequestClose={()=>setLeave(false)}><View style={{flex:1,padding:24,backgroundColor:'#172A3488',justifyContent:'center'}}><View style={s.panel}><Text style={s.heading}>¿Continuar más tarde?</Text><Text style={s.body}>{route.name==='exam'?'Las respuestas quedan guardadas. El reloj del simulacro seguirá contando.':'Tu sesión y la pregunta actual quedan guardadas para retomarlas desde Hoy.'}</Text><Button label="Seguir aquí" onPress={()=>setLeave(false)}/><Button secondary label="Guardar y salir" onPress={()=>{setLeave(false);pop();}}/></View></View></Modal></SafeAreaView></NavigationProvider>;
+}
+export default function App(){return <SafeAreaProvider><StoreProvider><View style={{flex:1,backgroundColor:'#E9EFF0'}}><Main/></View></StoreProvider></SafeAreaProvider>;}

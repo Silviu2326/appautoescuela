@@ -1,0 +1,5 @@
+import {createInterface} from 'node:readline/promises';
+import {writeFile,access} from 'node:fs/promises';
+import {randomBytes} from 'node:crypto';
+const file=new URL('./.env',import.meta.url);try{await access(file);console.error('Ya existe server/.env. Se conserva sin cambios.');process.exit(1);}catch{}
+const rl=createInterface({input:process.stdin,output:process.stdout});const email=(await rl.question('Correo del administrador editorial: ')).trim();rl.close();if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)){console.error('Correo inválido.');process.exit(1);}const password=randomBytes(24).toString('base64url');await writeFile(file,`HOST=127.0.0.1\nPORT=3001\nADMIN_EMAIL=${email}\nADMIN_PASSWORD=${password}\nALLOW_REGISTRATION=true\nALLOWED_ORIGINS=http://localhost:3001,http://127.0.0.1:3001,http://localhost:8081,http://localhost:8082,http://127.0.0.1:8082\n# PUBLIC_URL=https://tu-servidor\n# OPENAI_API_KEY=\nOPENAI_MODEL=gpt-4.1-mini\n`,{mode:0o600,flag:'wx'});console.log('Configuración creada en server/.env. Consulta ahí la contraseña editorial generada; no subas ese archivo a GitHub.');

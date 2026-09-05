@@ -1,0 +1,23 @@
+export type Topic = 'Seguridad' | 'Distracciones' | 'Preparación' | 'Conducción' | 'Cruces y prioridades';
+export type ReviewStatus = 'demonstration' | 'reviewed' | 'retired';
+export type Question = {
+ id:string; topic:Topic; prompt:string; options:[string,string,string]; correct:number; explanation:string; source:string;
+ concepts:string[]; family:string; version:number; pool:'training'|'assessment'; sceneId?:string;
+ review:ReviewStatus; reviewedBy:string|null; reviewedAt:string|null; rights:string;
+};
+export type Confidence='sure'|'unsure'|'guess';
+export type Answer = {id:string;questionId:string;questionVersion:number;concepts:string[];family:string;choice:number;correct:boolean;at:string;elapsedMs:number;confidence:Confidence;helpUsed:boolean;mode:'study'|'exam'|'scene'|'risk';sessionId:string};
+export type SessionResult = {id:string;title:string;at:string;total:number;correct:number;mode:'study'|'exam'|'scene'|'risk';unseen:number;elapsedMs:number;answers?:{questionId:string;choice:number|null;correct:boolean}[]};
+export type LessonNote={id:string;text:string;concepts:string[];at:string;updatedAt:string;deleted:boolean;teacherFeedback?:string};
+export type Bookmark={questionId:string;active:boolean;updatedAt:string};
+export type Settings={minutes:5|10|20;examDate:string;updatedAt:string};
+export type ActiveStudy={id:string;title:string;questions:Question[];answers:Answer[];index:number;selected:number|null;confidence:Confidence;helpUsed:boolean;checked:boolean;startedAt:string;questionStartedAt:string};
+export type ActiveExam={id:string;questions:Question[];choices:Record<string,number>;flags:string[];index:number;startedAt:string;deadline:string;unseen:number};
+export type Progress={version:2;answers:Answer[];sessions:SessionResult[];notes:LessonNote[];bookmarks:Bookmark[];settings:Settings;activeStudy:ActiveStudy|null;activeExam:ActiveExam|null};
+export type Mode='daily'|'quick'|'review'|Topic;
+export type Tab='Hoy'|'Aprender'|'Practicar'|'Mi avance';
+export type Concept={id:string;name:string;topic:Topic;summary:string;example:string;pitfall:string;prerequisites:string[];source:string;keywords:string[]};
+export type Mastery={id:string;stage:'new'|'understand'|'practice'|'consolidated';attempts:number;successes:number;days:number;variants:number;dueAt:string|null;lastAt:string|null;uncertain:boolean};
+export type Scene={id:string;name:string;rule:'right'|'giveA'|'giveB'|'stopA'|'blocked';winner:'A'|'B'|'none';explanation:string;concepts:string[];source:string};
+export type ContentPack={version:number;updatedAt:string;questions:Question[];concepts:Concept[];scenes:Scene[];notice:string};
+export type Connection={url:string;token:string;email:string};

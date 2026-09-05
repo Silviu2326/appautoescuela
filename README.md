@@ -64,4 +64,4 @@ El servidor utiliza scrypt, tokens opacos con caducidad y cuotas básicas. Falta
 
 La preparación mostrada describe los simulacros realizados: no calcula una probabilidad de aprobar. El contenido necesita validación profesional y ampliación sustancial. Deben verificarse audio, permisos, galería, reproducción y lectores de pantalla en Android e iOS reales antes de distribuir la aplicación.
 
-Consulta [la arquitectura](docs/ARQUITECTURA.md) para extender el proyecto. Los documentos e imágenes de diseño v0.1 se conservan en `docs/` como referencia histórica, no como descripción de la versión actual.
+Consulta [la arquitectura](docs/ARQUITECTURA.md) para extender el proyecto.

@@ -1,0 +1,9 @@
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import {Platform} from 'react-native';
+import * as SecureStore from 'expo-secure-store';
+import type {Connection} from '../types';
+const KEY='apunto.connection';
+export function normalizeServer(value:string){const u=new URL(value);if(u.username||u.password||u.search||u.hash||u.pathname!=='/')throw new Error('Usa solo la dirección del servidor, sin rutas ni credenciales.');const local=u.hostname==='localhost'||u.hostname==='127.0.0.1'||/^192\.168\./.test(u.hostname)||/^10\./.test(u.hostname)||/^172\.(1[6-9]|2\d|3[01])\./.test(u.hostname);if(u.protocol!=='https:'&&!(u.protocol==='http:'&&local))throw new Error('Usa HTTPS; HTTP solo se permite en una red local de desarrollo.');return u.origin;}
+export async function saveConnection(c:Connection|null){if(Platform.OS==='web'){if(c)sessionStorage.setItem(KEY,JSON.stringify(c));else sessionStorage.removeItem(KEY);}else{if(c)await SecureStore.setItemAsync(KEY,JSON.stringify(c));else await SecureStore.deleteItemAsync(KEY);}if(c)await AsyncStorage.setItem('apunto.server',c.url);}
+export async function loadConnection():Promise<Connection|null>{try{const raw=Platform.OS==='web'?sessionStorage.getItem(KEY):await SecureStore.getItemAsync(KEY);return raw?JSON.parse(raw):null;}catch{return null;}}
+export async function api<T>(c:Pick<Connection,'url'|'token'>,path:string,body?:unknown):Promise<T>{const res=await fetch(normalizeServer(c.url)+path,{method:body===undefined?'GET':'POST',headers:{'Content-Type':'application/json',...(c.token?{Authorization:`Bearer ${c.token}`}:{})},body:body===undefined?undefined:JSON.stringify(body),signal:AbortSignal.timeout(25000)});const data=await res.json();if(!res.ok)throw new Error(data.error??'El servidor no pudo completar la operación.');return data as T;}

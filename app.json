@@ -1,0 +1,42 @@
+{
+  "expo": {
+    "name": "A punto",
+    "slug": "a-punto",
+    "version": "0.2.0",
+    "orientation": "portrait",
+    "icon": "./assets/icon.png",
+    "userInterfaceStyle": "light",
+    "ios": {
+      "supportsTablet": false,
+      "bundleIdentifier": "com.apunto.autoescuela"
+    },
+    "android": {
+      "adaptiveIcon": {
+        "backgroundColor": "#176B55",
+        "foregroundImage": "./assets/android-icon-foreground.png",
+        "monochromeImage": "./assets/android-icon-monochrome.png"
+      },
+      "predictiveBackGestureEnabled": false,
+      "package": "com.apunto.autoescuela"
+    },
+    "web": {
+      "favicon": "./assets/favicon.png"
+    },
+    "plugins": [
+      [
+        "expo-audio",
+        {
+          "microphonePermission": "Permite grabar tu duda para transcribirla cuando lo solicites."
+        }
+      ],
+      [
+        "expo-image-picker",
+        {
+          "photosPermission": "Permite elegir la captura de una pregunta para consultarla.",
+          "cameraPermission": "Permite capturar una pregunta para consultarla."
+        }
+      ],
+      "expo-secure-store"
+    ]
+  }
+}
